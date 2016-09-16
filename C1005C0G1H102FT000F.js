@@ -41,9 +41,16 @@ angular.module('C1005C0G1H102FT000F', ['ngAnimate'])
             }
 
             $scope.highcharts = $('#container').highcharts({
-                chart: {borderWidth: 2, borderColor: '#bbb', type: 'scatter'},
+                chart: {borderWidth: 2, borderColor: '#bbb', type: 'scatter',
+                    events:{
+                        load:function(){
+                            bindMouseEventsOnPath();
+                        }
+                    }
+                },
                 legend: {enabled: false},
                 title: {text: ''},
+
                 xAxis: {
                     opposite:true,
                     gridLineWidth: 1,
@@ -203,3 +210,26 @@ return {
     }
 };
 });
+
+function bindMouseEventsOnPath(){
+                $("path").off("mouseover").on("mouseover",function(event){
+                    var $currentTarget = $(event.currentTarget);
+                    var currentTarget = $currentTarget[0];
+                    var point = currentTarget.point;
+                    if(point){
+                        var x = point.x, y = point.y;
+                        var $tableRow = $(".table_row");
+                        $tableRow.each(function(){
+                            var $this = $(this);
+                            var price = parseFloat($this.find("td.td_price").attr("value"));
+                            var time = parseFloat($this.find("td.td_time").attr("value"));
+                            if(price === y && time === x){
+                                $this.addClass("hover");
+                            }
+                        });
+                    }
+                });
+                $("path").off("mouseout").on("mouseout",function(event){
+                    $(".table_row").removeClass("hover");
+                });
+            }

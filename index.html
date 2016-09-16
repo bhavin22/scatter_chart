@@ -107,13 +107,13 @@
                             </thead>
                             <tbody>
 
+                                <tr class="table_row" ng-repeat="article in filtered = (articles | filter:search | orderBy:sortType:sortReverse | orderBy:sort | filter:qtyFilter | filter:dateFilter | limitTo:limit)">
 
-                                <tr ng-repeat="article in filtered = (articles | filter:search | orderBy:sortType:sortReverse | orderBy:sort | filter:qtyFilter | filter:dateFilter | limitTo:limit)">
                                     <td>{{article.source}}</td>
                                     <td>{{article.manufacturer}}</td>
-                                    <td value="{{article.price}}">$ {{article.price}}</td>
+                                    <td class="td_price" value="{{article.price}}">$ {{article.price}}</td>
                                     <td>{{article.packaging}}</td>
-                                    <td value="{{article.leadtime}}">{{article.leadtime}}</td>
+                                    <td class="td_time" value="{{article.leadtime}}">{{article.leadtime}}</td>
                                     <td>{{article.qtyAvailable}}</td>
                                     <td>{{article.bestprice}}</td>
                                     <td style="width:20px !important; padding:8px 2px">
@@ -181,6 +181,35 @@
         <script src="/assets/js/ui-bootstrap-tpls-2.1.3.min.js"></script>
         <script src="C1005C0G1H102FT000F.js"></script>
         <script src="assets/js/angularjs-nvd3-directives.js"></script>
+
+        <script>
+
+            function bindMouseEventsOnTable(){
+                $("body").on("mouseover",".table_row",function(event){
+                // $(".table_row").off("mouseover").on("mouseover",function(event){
+                    var $currentTarget = $(event.currentTarget);
+                    var price = parseFloat($currentTarget.find("td.td_price").attr("value"));
+                    var time = parseFloat($currentTarget.find("td.td_time").attr("value"));
+                    var $paths = $("path");
+                    $paths.each(function(){
+                        var $this = $(this);
+                        if($this[0].point){
+                            var x = $this[0].point.x;
+                            var y = $this[0].point.y;
+                            if(price === y && time === x){
+                                $this.mouseover();
+                            }
+                        }
+                    });
+                });
+                $("body").on("mouseout",".table_row",function(event){
+                    $(event.currentTarget).removeClass("hover");
+                });
+            }
+            $(document).ready(function(){
+                bindMouseEventsOnTable();
+            });
+        </script>
 
     </body>
 </html>

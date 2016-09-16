@@ -388,6 +388,6 @@ rect {
     color: #000;
 }
 
-tr:hover {
+tr:hover,tr.hover {
   background: #ffd059;
 }
