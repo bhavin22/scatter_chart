@@ -1,0 +1,259 @@
+<html ng-app="C1005C0G1H102FT000F">
+    <head>
+        <meta charset="utf8" />
+        <title>Title</title>
+        <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Titillium+Web:200,300,600" rel="stylesheet">
+        <link href="assets/css/style.css" rel="stylesheet" type="text/css">
+        <link href="assets/css/input-range.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+    </head>
+
+    <body ng-controller="ArticlesCtrl" >
+
+
+
+        <div class="container">
+
+
+
+
+
+
+            <div class="check-element animate-hide row panel-body" ng-hide="showme">
+                <form>
+                    <br />
+                    <div class="col-md-4 margin-top-s">
+                      <div class="row">
+                        <div class="form-group col-md-12">
+                            <h3 class="text-danger">some Filtering:</h3>
+                        </div>
+                        <div class="form-group col-md-12">
+
+                            <label for="pcs" class="control-label">Select quantity: </label>
+                            <input type="range" min="50" step="50" max="50000" ng-model="qty.qty" ng-change="cart.removeArticle(article)">
+                            <input type="number" min="50" ng-model="qty.qty" class="form-control margin-top-s" size="20" ng-change="cart.removeArticle(article)" />
+
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="control-label" for="formInput1">Packaging</label>
+                            <select class="form-control" ng-model="search.packaging">
+                                <option value="">Filter packaging</option>
+                                <option value="big">big</option>
+                                <option value="small">small</option>
+                                <option value="smaller">smaller</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label class="control-label" for="formInput2">Source type</label>
+                            <select class="form-control" ng-model="search.source">
+                                <option value="">Filter blub or bla</option>
+                                <option value="blub">blub</option>
+                                <option value="bla">bla</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="control-label" for="formInput3">Delivery Date</label>
+                            <input class="form-control" ng-model="datePicker" type="text" id="datepicker" ng-change="cart.removeArticle(article)">
+                        </div>
+
+                        <div class="form-group col-md-12">
+                          <input type="checkbox" data-ng-model='search.mindurability' data-ng-true-value='' data-ng-false-value='12' />  Include daycode more than 2 years
+
+                        </div>
+
+
+                      </div>
+                    <div id="container" style="width: %; height: 300px;"></div>
+
+                    </div>
+
+                    <div class="col-md-8 margin-top-s">
+                        <table class="table margin-top-s">
+                            <thead>
+                                <tr class="bg-primary">
+
+                                    <th class="bg-primary">
+                                        Source type
+                                    </th>
+                                    <th class="bg-primary">
+                                        Manufacturer
+                                    </th>
+                                    <th class="bg-primary">
+                                        Price
+                                    </th>
+                                    <th>
+                                        Packaging
+                                    </th>
+                                    <th>
+                                        time in weeks
+                                    </th>
+                                    <th>
+                                        Available Qty
+                                    </th>
+
+                                    <th>
+                                        bla
+                                    </th>
+                                    <th>
+                                        &nbsp;
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+
+                                <tr ng-repeat="article in articles | limitTo:limit | filter:search | orderBy:sortType:sortReverse | orderBy:sort | filter:qtyFilter | filter:dateFilter">
+                                    <td>{{article.source}}</td>
+                                    <td>{{article.manufacturer}}</td>
+                                    <td value="{{article.price}}">$ {{article.price}}</td>
+                                    <td>{{article.packaging}}</td>
+                                    <td value="{{article.leadtime}}">{{article.leadtime}}</td>
+                                    <td>{{article.qtyAvailable}}</td>
+                                    <td>{{article.bestprice}}</td>
+                                    <td style="width:20px !important; padding:8px 2px">
+                                        <a href class="btn btn-sm pop" ng-click="cart.addArticle(article);" mypopover data-placement="right" title="" data-content="Added to cart"><i class="fa fa-cart-plus"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </form>
+            </div>
+
+            <div ng-controller="CartCtrl" class="check-element animate-hide row panel-body" ng-show="showme">
+                <div ng-hide="cart.getItems().length" class="alert alert-info">Your cart is empty.</div>
+                <table ng-show="cart.getItems().length" class="table">
+                  <tr ng-repeat="item in cart.getItems() track by $index" class="cart-item">
+                      <td>{{item.packaging}}</td>
+                      <td>Delivery by {{item.date}} weeks</td>
+                      <td>price per item {{item.price | currency}}</td>
+                      <td>tax:</td>
+                      <td>{{cart.sum() * 0.12 | currency}}</td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <a href class="btn btn-default btn-sm" ng-click="cart.removeArticle(article);">x remove order</a>
+                      </td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>total:</td>
+                      <td><b>{{cart.sum() | currency }}</b></td>
+                  </tr>
+                </table>
+            </div>
+            <div class="row panel-body">
+                <div class="col-md-4"><!-- SPACER --></div>
+                <div class="col-md-4">
+                  <button ng-click="incrementLimit()" id="increment" ng-hide="showme" type="button" class="btn btn-info margin-bottom-s" style="width:100%">Show all available offers</button>
+                  <button ng-click="decrementLimit()" id="decrement" ng-hide="showme" type="button" class="btn btn-info margin-bottom-s" style="width:100%">Show only suggested offers</button>
+                </div>
+                <div class="col-md-4">
+                    <button href="" ng-click="showme=true" ng-hide="showme" type="button" class="btn btn-primary margin-bottom-s" style="width:100%">View your cart</button>
+                    <button ng-click="showme=false" ng-show="showme" type="button" class="btn btn-default" style="float:right;">back to shop</button>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+
+        $(function () {
+            $('#container').highcharts({
+
+                chart: {
+                    borderWidth: 2,
+                    borderColor: '#bbb',
+                    type: 'scatter',
+
+                },
+                legend: {
+                    enabled: false
+                },
+                title: {
+                    text: ''
+                },
+
+                xAxis: {
+                    opposite:true,
+                    gridLineWidth: 1,
+                    title: {
+                        enabled: true,
+                        text: 'Lead time (weeks)'
+                    },
+                    startOnTick: true,
+                    endOnTick: true,
+                    showLastLabel: true,
+                    decimals: true
+                },
+                yAxis: {
+                    reversed: true,
+                    title: {
+                        text: 'Price per Item'
+                    },
+                    decimals: true
+                },
+                tooltip: {
+                  crosshairs: [true, true]
+                },
+
+                plotOptions: {
+                    scatter: {
+                        marker: {
+                            radius: 4,
+                            states: {
+                                hover: {
+                                    radius: 10,
+                                    enabled: true,
+                                    lineColor: '#ff96b2'
+                                }
+                            }
+                        },
+                        states: {
+                            hover: {
+                                marker: {
+                                    enabled: true
+                                }
+                            }
+                        },
+                        tooltip: {
+                          headerFormat: '<b>{series.name}</b><br>',
+                          pointFormat: '$ {point.y} price per item, <br>Lead time {point.x} weeks<br><i class="fa fa-cart-plus fa-lg"></i>'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Your offer',
+                    color: '#ff96b2',
+                    borderColor: '#ff96b2',
+                    data: [[6, 1.12], [6, 1.22], [6, 1.51], [6, 1.55], [8, 1.02],
+                        [8, 1.05],[8,1.10],[8,1.15],[10,0.83],[10,0.87]]
+
+                        }]
+                    });
+                });
+
+
+        </script>
+        <script>
+          $( function() {
+            $("#datepicker").datepicker({ dateFormat: "mm/dd/yy" }).val()
+            $("#datepicker-2").datepicker({ dateFormat: "mm/dd/yy" }).val()
+          } );
+        </script>
+        <script src="bootstrap/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-animate.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls-2.1.3.min.js"></script>
+        <script src="C1005C0G1H102FT000F.js"></script>
+        <script src="assets/js/angularjs-nvd3-directives.js"></script>
+
+    </body>
+</html>
