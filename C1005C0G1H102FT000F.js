@@ -35,6 +35,78 @@ angular.module('C1005C0G1H102FT000F', ['ngAnimate'])
     $scope.searchFish   = '';     // set the default search/filter term
     $http.get('C1005C0G1H102FT000F.json').then(function(articlesResponse) {
         $scope.articles = articlesResponse.data;
+        $scope.chrtData = [];
+        for(var i=0; i<$scope.articles.length; i++) {
+            
+            $scope.chrtData.push([$scope.articles[i].leadtime, $scope.articles[i].price, i]);
+        }
+        $('#container').highcharts({
+                chart: {
+                    borderWidth: 2,
+                    borderColor: '#bbb',
+                    type: 'scatter',
+                },
+                legend: {
+                    enabled: false
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    opposite:true,
+                    gridLineWidth: 1,
+                    title: {
+                        enabled: true,
+                        text: 'Lead time (weeks)'
+                    },
+                    startOnTick: true,
+                    endOnTick: true,
+                    showLastLabel: true,
+                    decimals: true
+                },
+                yAxis: {
+                    reversed: true,
+                    title: {
+                        text: 'Price per Item'
+                    },
+                    decimals: true
+                },
+                tooltip: {
+                  crosshairs: [true, true]
+                },
+
+                plotOptions: {
+                    scatter: {
+                        marker: {
+                            radius: 4,
+                            states: {
+                                hover: {
+                                    radius: 10,
+                                    enabled: true,
+                                    lineColor: '#ff96b2'
+                                }
+                            }
+                        },
+                        states: {
+                            hover: {
+                                marker: {
+                                    enabled: true
+                                }
+                            }
+                        },
+                        tooltip: {
+                          headerFormat: '<b>{series.name}</b><br>',
+                          pointFormat: '$ {point.y} price per item, <br>Lead time {point.x} weeks<br><i class="fa fa-cart-plus fa-lg"></i>'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Your offer',
+                    color: '#ff96b2',
+                    borderColor: '#ff96b2',
+                    data: $scope.chrtData
+                    }]
+                });
     });
         $scope.$watch('qty.qty', function(val) {
         if (val) {
