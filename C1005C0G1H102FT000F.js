@@ -151,14 +151,18 @@ angular.module('C1005C0G1H102FT000F', ['ngAnimate'])
     },
 
     $scope.dateFilter = function (article) {
-        var dte = parseFloat(article.date);
-        var max = parseFloat($scope.datePicker);
-        console.log($scope.datePicker)
-        console.log(article.date)
-        if (!dte) {
+        var leadTime = parseInt(article.leadtime);
+        var maxDate = new Date($scope.datePicker);
+        var todaysDate = new Date();
+        var diff = maxDate.getTime() - todaysDate.getTime();
+        if(diff < 0){
+            return true;
+        }
+        var diffInWeeks = Math.ceil(diff / (1000 * 60 * 60 * 24 * 7));
+        if (!leadTime) {
           return false;
         }
-        if(dte > max) {
+        if(leadTime > diffInWeeks) {
           return false;
         }
         return true;
