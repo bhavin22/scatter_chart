@@ -107,8 +107,8 @@
                             </thead>
                             <tbody>
 
+                                <tr class="table_row" ng-repeat="article in filtered = (articles | filter:search | orderBy:sortType:sortReverse | orderBy:sort | filter:qtyFilter | filter:dateFilter | limitTo:limit)">
 
-                                <tr class="table_row" ng-repeat="article in articles | limitTo:limit | filter:search | orderBy:sortType:sortReverse | orderBy:sort | filter:qtyFilter | filter:dateFilter">
                                     <td>{{article.source}}</td>
                                     <td>{{article.manufacturer}}</td>
                                     <td class="td_price" value="{{article.price}}">$ {{article.price}}</td>

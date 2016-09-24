@@ -25,45 +25,38 @@ angular.module('C1005C0G1H102FT000F', ['ngAnimate'])
   })
 
 
-  .controller('ArticlesCtrl', function($scope, $http, Cart){
-
+   .controller('ArticlesCtrl', function($scope, $http, $timeout, Cart){
 
     $scope.cart = Cart;
     $scope.myNumber = 5;
     $scope.sortType     = 'bestoffer'; // set the default sort type
     $scope.sortReverse  = false;  // set the default sort order
     $scope.searchFish   = '';     // set the default search/filter term
-    $http.get('C1005C0G1H102FT000F.json').then(function(articlesResponse) {
-        $scope.articles = articlesResponse.data;
-        $scope.chrtData = [];
-        for(var i=0; i<$scope.articles.length; i++) {
-            
-            $scope.chrtData.push([$scope.articles[i].leadtime, $scope.articles[i].price, i]);
-        }
-        $('#container').highcharts({
-                chart: {
-                    borderWidth: 2,
-                    borderColor: '#bbb',
-                    type: 'scatter',
+
+    // function to generate chart data after table data loaded.
+    $scope.generateChartData = function() {
+        $timeout(function() {
+            // prepare chart data from table filtered data
+            $scope.chrtData = [];
+            for(var i=0; i<$scope.filtered.length; i++) {
+                $scope.chrtData.push([$scope.filtered[i].leadtime, $scope.filtered[i].price, i]);
+            }
+
+            $scope.highcharts = $('#container').highcharts({
+                chart: {borderWidth: 2, borderColor: '#bbb', type: 'scatter',
                     events:{
                         load:function(){
                             bindMouseEventsOnPath();
                         }
                     }
                 },
-                legend: {
-                    enabled: false
-                },
-                title: {
-                    text: ''
-                },
+                legend: {enabled: false},
+                title: {text: ''},
+
                 xAxis: {
                     opposite:true,
                     gridLineWidth: 1,
-                    title: {
-                        enabled: true,
-                        text: 'Lead time (weeks)'
-                    },
+                    title: {enabled: true,text: 'Lead time (weeks)'},
                     startOnTick: true,
                     endOnTick: true,
                     showLastLabel: true,
@@ -71,9 +64,7 @@ angular.module('C1005C0G1H102FT000F', ['ngAnimate'])
                 },
                 yAxis: {
                     reversed: true,
-                    title: {
-                        text: 'Price per Item'
-                    },
+                    title: {text: 'Price per Item'},
                     decimals: true
                 },
                 tooltip: {
@@ -110,16 +101,23 @@ angular.module('C1005C0G1H102FT000F', ['ngAnimate'])
                     color: '#ff96b2',
                     borderColor: '#ff96b2',
                     data: $scope.chrtData
-                    }]
-                });
+                }]
+            });
+        });
+    }
+
+    $http.get('C1005C0G1H102FT000F.json').then(function(articlesResponse) {
+        $scope.articles = articlesResponse.data;
+        // display chart data from table data
+        $scope.generateChartData();
     });
-        $scope.$watch('qty.qty', function(val) {
+
+    $scope.$watchGroup(['qty.qty','search.packaging','search.source', 'datePicker', 'search.mindurability'], function(val) {
         if (val) {
-            console.log(val);
-            angular.forEach($scope.articles,function(item,index){ item["qtyOrdered"] = val; ;
-            })
+            // display chart data after filter data in table
+            $scope.generateChartData();
         }
-      });
+    });
       $('#decrement').hide();
         var limitStep = 10;
         $scope.limit = limitStep;
@@ -127,11 +125,15 @@ angular.module('C1005C0G1H102FT000F', ['ngAnimate'])
             $scope.limit = 100000;
             $('#decrement').show();
             $('#increment').hide();
+            // display chart data after filter data in table
+            $scope.generateChartData();
         };
         $scope.decrementLimit = function() {
             $scope.limit = 10;
             $('#decrement').hide();
             $('#increment').show();
+            // display chart data after filter data in table
+            $scope.generateChartData();
         };
 
 
@@ -170,7 +172,7 @@ angular.module('C1005C0G1H102FT000F', ['ngAnimate'])
   })
   .controller('CartCtrl', function($scope, Cart){
     $scope.cart = Cart;
-  })
+  });
 
 function Quantity(numOfPcs) {
     var qty = numOfPcs;
@@ -217,25 +219,26 @@ return {
 };
 });
 
+// bind mouse hover event
 function bindMouseEventsOnPath(){
-                $("path").off("mouseover").on("mouseover",function(event){
-                    var $currentTarget = $(event.currentTarget);
-                    var currentTarget = $currentTarget[0];
-                    var point = currentTarget.point;
-                    if(point){
-                        var x = point.x, y = point.y;
-                        var $tableRow = $(".table_row");
-                        $tableRow.each(function(){
-                            var $this = $(this);
-                            var price = parseFloat($this.find("td.td_price").attr("value"));
-                            var time = parseFloat($this.find("td.td_time").attr("value"));
-                            if(price === y && time === x){
-                                $this.addClass("hover");
-                            }
-                        });
-                    }
-                });
-                $("path").off("mouseout").on("mouseout",function(event){
-                    $(".table_row").removeClass("hover");
-                });
-            }
+    $("path").off("mouseover").on("mouseover",function(event){
+        var $currentTarget = $(event.currentTarget);
+        var currentTarget = $currentTarget[0];
+        var point = currentTarget.point;
+        if(point){
+            var x = point.x, y = point.y;
+            var $tableRow = $(".table_row");
+            $tableRow.each(function(){
+                var $this = $(this);
+                var price = parseFloat($this.find("td.td_price").attr("value"));
+                var time = parseFloat($this.find("td.td_time").attr("value"));
+                if(price === y && time === x){
+                    $this.addClass("hover");
+                }
+            });
+        }
+    });
+    $("path").off("mouseout").on("mouseout",function(event){
+        $(".table_row").removeClass("hover");
+    });
+}
